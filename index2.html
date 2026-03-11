@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIV Vector Orbit</title>
+    <style>
+        :root {
+            --bg-color: #0a0a0c;
+            --accent-color: #00f2ff;
+            --secondary-color: #7000ff;
+            --text-color: #ffffff;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: var(--bg-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* Container for the logo and orbiting elements */
+        .scene {
+            position: relative;
+            width: 600px;
+            height: 600px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* The AIV Logo Styling */
+        .logo-container {
+            z-index: 10;
+            filter: drop-shadow(0 0 15px rgba(0, 242, 255, 0.5));
+        }
+
+        .logo-svg {
+            width: 200px;
+            fill: none;
+            stroke: var(--accent-color);
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        /* Self-drawing animation for the letters */
+        .draw-path {
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+            animation: draw 3s ease-forward forwards;
+        }
+
+        @keyframes draw {
+            to { stroke-dashoffset: 0; }
+        }
+
+        /* Orbiting Objects */
+        .orbit-system {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .orb {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            fill: none;
+            stroke: var(--secondary-color);
+            stroke-width: 1;
+            opacity: 0.6;
+        }
+
+        /* Orbit Animations */
+        .orbit-1 { animation: rotate 15s linear infinite; }
+        .orbit-2 { animation: rotate 25s linear infinite reverse; }
+        .orbit-3 { animation: rotate 35s linear infinite; }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .label {
+            position: absolute;
+            bottom: 10%;
+            color: var(--accent-color);
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="scene">
+        <div class="orbit-system">
+            <svg class="orb orbit-1" style="width: 500px; height: 500px; margin-top: -250px; margin-left: -250px;">
+                <circle cx="250" cy="250" r="240" stroke-dasharray="10, 20" />
+                <rect x="240" y="0" width="20" height="20" fill="var(--accent-color)" />
+            </svg>
+
+            <svg class="orb orbit-2" style="width: 400px; height: 400px; margin-top: -200px; margin-left: -200px;">
+                <path d="M 200,50 L 350,300 L 50,300 Z" stroke-dasharray="5, 5" />
+                <circle cx="200" cy="50" r="6" fill="var(--secondary-color)" />
+            </svg>
+
+            <svg class="orb orbit-3" style="width: 300px; height: 300px; margin-top: -150px; margin-left: -150px;">
+                <path d="M 150,50 L 250,100 L 250,200 L 150,250 L 50,200 L 50,100 Z" />
+            </svg>
+        </div>
+
+        <div class="logo-container">
+            <svg class="logo-svg" viewBox="0 0 300 100">
+                <path class="draw-path" d="M 20,90 L 50,10 L 80,90 M 35,60 L 65,60" />
+                <path class="draw-path" d="M 120,10 L 120,90 M 105,10 L 135,10 M 105,90 L 135,90" style="animation-delay: 0.5s;" />
+                <path class="draw-path" d="M 170,10 L 210,90 L 250,10" style="animation-delay: 1s;" />
+            </svg>
+        </div>
+
+        <div class="label">Vector Systems Active</div>
+    </div>
+
+</body>
+</html>
