@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AIV - Deep Space HAM Network</title>
+    <title>AIV - Multi-Satellite HAM Network</title>
     <style>
         :root {
             --bg: #010103;
@@ -23,7 +23,6 @@
             font-family: 'Segoe UI', sans-serif;
         }
 
-        /* PARALLAX STARFIELD */
         #star-layer {
             position: absolute;
             top: -10%; left: -10%;
@@ -32,7 +31,6 @@
             pointer-events: none;
         }
 
-        /* VIEWPORT CONTAINER */
         .viewport {
             position: relative;
             width: 100vw; height: 100vh;
@@ -42,54 +40,39 @@
             z-index: 2;
         }
 
-        /* CENTRAL EARTH */
+        /* EARTH */
         .earth-container {
             position: relative;
-            width: 450px; height: 450px;
+            width: 420px; height: 420px;
             border-radius: 50%;
             background: var(--water);
-            box-shadow: inset -30px -30px 60px rgba(0,0,0,0.9), 0 0 40px rgba(0, 242, 255, 0.3);
+            box-shadow: inset -30px -30px 60px rgba(0,0,0,0.9), 0 0 50px rgba(0, 242, 255, 0.2);
             overflow: hidden;
             z-index: 5;
             border: 1px solid rgba(255,255,255,0.1);
         }
 
-        /* Spinning Land & Clouds */
         .map-layer, .cloud-layer {
             position: absolute;
             width: 200%; height: 100%;
-            animation: spin 20s linear infinite;
+            animation: spin 25s linear infinite;
         }
 
         .map-layer {
             background-image: 
-                radial-gradient(circle at 10% 40%, var(--land) 12%, transparent 13%),
-                radial-gradient(circle at 40% 20%, var(--land) 18%, transparent 19%),
-                radial-gradient(circle at 70% 70%, var(--land) 22%, transparent 23%),
-                radial-gradient(circle at 85% 30%, var(--land) 15%, transparent 16%);
+                radial-gradient(circle at 15% 45%, var(--land) 12%, transparent 13%),
+                radial-gradient(circle at 45% 25%, var(--land) 18%, transparent 19%),
+                radial-gradient(circle at 75% 65%, var(--land) 22%, transparent 23%);
         }
 
         .cloud-layer {
-            opacity: 0.3;
-            filter: blur(10px);
-            background-image: radial-gradient(ellipse at 30% 50%, #fff 15%, transparent 30%),
-                              radial-gradient(ellipse at 80% 20%, #fff 10%, transparent 25%);
-            animation-duration: 35s;
-            animation-direction: reverse;
+            opacity: 0.3; filter: blur(8px);
+            background-image: radial-gradient(ellipse at 40% 50%, #fff 15%, transparent 30%);
+            animation-duration: 40s; animation-direction: reverse;
         }
 
-        @keyframes spin {
-            from { transform: translateX(0); }
-            to { transform: translateX(-50%); }
-        }
+        @keyframes spin { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 
-        /* BUILDINGS */
-        .city {
-            position: absolute;
-            bottom: 40%; width: 100%;
-            display: flex; justify-content: center; align-items: flex-end;
-            z-index: 6;
-        }
         .tower { fill: #000; stroke: var(--primary); stroke-width: 1.5; transition: stroke 0.3s; }
 
         /* AIV LOGO */
@@ -100,41 +83,33 @@
             filter: drop-shadow(0 0 15px var(--primary));
         }
         .letter {
-            fill: none;
-            stroke: var(--primary);
-            stroke-width: 7;
-            stroke-linecap: round;
+            fill: none; stroke: var(--primary);
+            stroke-width: 8; stroke-linecap: round;
             transition: stroke 0.3s;
         }
 
-        /* SATELLITE ORBIT */
-        .orbit-ring {
+        /* SATELLITES */
+        .orbit {
             position: absolute;
-            width: 750px; height: 750px;
-            animation: rotate 12s linear infinite;
-            z-index: 30;
+            border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.05);
+            animation: rotate linear infinite;
         }
-        .sat { position: absolute; top: 0; left: 50%; transform: translateX(-50%); }
+        
+        /* Different Satellite Sizes/Speeds */
+        .orbit-main { width: 700px; height: 700px; animation-duration: 15s; z-index: 30; }
+        .orbit-small { width: 550px; height: 550px; animation-duration: 8s; animation-direction: reverse; }
+        .orbit-far { width: 850px; height: 850px; animation-duration: 25s; }
 
-        /* BEAM */
-        #beam-svg {
-            position: absolute;
-            width: 100%; height: 100%;
-            pointer-events: none;
-            z-index: 25;
-        }
-        #beam-path {
-            stroke: var(--primary);
-            stroke-width: 2;
-            stroke-dasharray: 6;
-            opacity: 0.8;
-            filter: drop-shadow(0 0 5px var(--primary));
-        }
+        .sat-icon { position: absolute; top: 0; left: 50%; transform: translateX(-50%); }
 
-        @keyframes rotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
+        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        /* BEAM & PULSE */
+        #beam-svg { position: absolute; width: 100%; height: 100%; pointer-events: none; z-index: 25; }
+        #beam-path { stroke: var(--primary); stroke-width: 1; stroke-dasharray: 4; opacity: 0.5; }
+        #pulse-dot { fill: var(--primary); filter: blur(1px); }
+
     </style>
 </head>
 <body>
@@ -145,84 +120,103 @@
         <div class="earth-container">
             <div class="map-layer"></div>
             <div class="cloud-layer"></div>
-            <div class="city">
-                <svg width="100" height="60" viewBox="0 0 100 60">
-                    <rect class="tower" x="42" y="10" width="15" height="50" />
-                    <line class="tower" x1="50" y1="10" x2="50" y2="0" />
-                    <circle id="ground-station" cx="50" cy="0" r="2" fill="red" />
+            <div style="position: absolute; bottom: 42%; width: 100%; display: flex; justify-content: center;">
+                <svg width="60" height="40">
+                    <rect class="tower" x="25" y="10" width="10" height="30" />
+                    <circle id="ground-station" cx="30" cy="10" r="2" fill="red" />
                 </svg>
             </div>
         </div>
 
         <div class="logo-wrap">
-            <svg width="450" height="150" viewBox="0 0 450 150">
-                <path class="letter" d="M 100,120 L 150,30 L 200,120 M 125,90 L 175,90" />
-                <path class="letter" d="M 225,30 L 225,120" />
-                <path class="letter" d="M 250,30 L 300,120 L 350,30" />
+            <svg width="400" height="120" viewBox="0 0 400 120">
+                <path class="letter" d="M 80,100 L 130,20 L 180,100 M 105,75 L 155,75" />
+                <path class="letter" d="M 200,20 L 200,100" />
+                <path class="letter" d="M 230,20 L 270,100 L 310,20" />
             </svg>
         </div>
 
-        <div class="orbit-ring">
-            <svg class="sat" width="70" height="70" viewBox="0 0 100 100">
-                <rect x="0" y="40" width="30" height="20" fill="#222" stroke="var(--primary)" />
-                <rect x="70" y="40" width="30" height="20" fill="#222" stroke="var(--primary)" />
-                <rect x="30" y="30" width="40" height="40" fill="#111" stroke="#fff" />
+        <div class="orbit orbit-main">
+            <svg class="sat-icon" width="50" height="50" viewBox="0 0 100 100">
+                <rect x="30" y="30" width="40" height="40" fill="#111" stroke="white" />
+                <rect x="0" y="45" width="30" height="10" fill="#333" stroke="var(--primary)" />
+                <rect x="70" y="45" width="30" height="10" fill="#333" stroke="var(--primary)" />
                 <circle id="sat-antenna" cx="50" cy="50" r="3" fill="red" />
+            </svg>
+        </div>
+
+        <div class="orbit orbit-small">
+            <svg class="sat-icon" width="20" height="20" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="30" fill="#222" stroke="white" />
+                <line x1="50" y1="20" x2="50" y2="0" stroke="white" />
+            </svg>
+        </div>
+
+        <div class="orbit orbit-far">
+            <svg class="sat-icon" width="80" height="40" viewBox="0 0 200 100">
+                <rect x="80" y="40" width="40" height="20" fill="#111" stroke="white" />
+                <rect x="20" y="20" width="40" height="60" fill="#333" stroke="var(--primary)" />
+                <rect x="140" y="20" width="40" height="60" fill="#333" stroke="var(--primary)" />
             </svg>
         </div>
 
         <svg id="beam-svg">
             <line id="beam-path" x1="0" y1="0" x2="0" y2="0" />
+            <circle id="pulse-dot" r="4" cx="0" cy="0" />
         </svg>
     </div>
 
     <script>
         const stars = document.getElementById('star-layer');
-        const starCount = 150;
         const beam = document.getElementById('beam-path');
+        const pulse = document.getElementById('pulse-dot');
         const satAntenna = document.getElementById('sat-antenna');
         const groundStation = document.getElementById('ground-station');
+        let pulseProgress = 0;
 
-        // Create random stars
-        for (let i = 0; i < starCount; i++) {
-            const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-            circle.setAttribute("cx", Math.random() * 100 + "%");
-            circle.setAttribute("cy", Math.random() * 100 + "%");
-            circle.setAttribute("r", Math.random() * 1.5);
-            circle.setAttribute("fill", "white");
-            circle.setAttribute("opacity", Math.random());
-            stars.appendChild(circle);
+        for (let i = 0; i < 150; i++) {
+            const c = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+            c.setAttribute("cx", Math.random() * 100 + "%");
+            c.setAttribute("cy", Math.random() * 100 + "%");
+            c.setAttribute("r", Math.random() * 1.5);
+            c.setAttribute("fill", "white");
+            c.setAttribute("opacity", Math.random());
+            stars.appendChild(c);
         }
 
         window.addEventListener('mousemove', (e) => {
-            const xPercent = e.clientX / window.innerWidth;
-            const yPercent = e.clientY / window.innerHeight;
-
-            // Parallax Stars
-            const moveX = (xPercent - 0.5) * 30;
-            const moveY = (yPercent - 0.5) * 30;
-            stars.style.transform = `translate(${moveX}px, ${moveY}px)`;
-
-            // Color shift
-            const hue = xPercent * 360;
-            const color = `hsl(${hue}, 100%, 65%)`;
+            const xP = e.clientX / window.innerWidth;
+            const yP = e.clientY / window.innerHeight;
+            stars.style.transform = `translate(${(xP-0.5)*40}px, ${(yP-0.5)*40}px)`;
+            const color = `hsl(${xP * 360}, 100%, 65%)`;
             document.documentElement.style.setProperty('--primary', color);
-            document.querySelectorAll('.letter, .tower, #beam-path').forEach(el => el.style.stroke = color);
+            document.querySelectorAll('.letter, .tower, #beam-path, #pulse-dot').forEach(el => {
+                el.style.stroke = color;
+                if(el.id === 'pulse-dot') el.style.fill = color;
+            });
         });
 
-        function syncBeam() {
-            const satRect = satAntenna.getBoundingClientRect();
-            const groundRect = groundStation.getBoundingClientRect();
+        function updateScene() {
+            const sR = satAntenna.getBoundingClientRect();
+            const gR = groundStation.getBoundingClientRect();
+            
+            const x1 = sR.left + sR.width/2;
+            const y1 = sR.top + sR.height/2;
+            const x2 = gR.left + gR.width/2;
+            const y2 = gR.top + gR.height/2;
 
-            beam.setAttribute('x1', satRect.left + satRect.width/2);
-            beam.setAttribute('y1', satRect.top + satRect.height/2);
-            beam.setAttribute('x2', groundRect.left + groundRect.width/2);
-            beam.setAttribute('y2', groundRect.top + groundRect.height/2);
+            beam.setAttribute('x1', x1); beam.setAttribute('y1', y1);
+            beam.setAttribute('x2', x2); beam.setAttribute('y2', y2);
 
-            requestAnimationFrame(syncBeam);
+            // Animate Pulse
+            pulseProgress += 0.02;
+            if (pulseProgress > 1) pulseProgress = 0;
+            pulse.setAttribute('cx', x1 + (x2 - x1) * pulseProgress);
+            pulse.setAttribute('cy', y1 + (y2 - y1) * pulseProgress);
+
+            requestAnimationFrame(updateScene);
         }
-
-        syncBeam();
+        updateScene();
     </script>
 </body>
 </html>
