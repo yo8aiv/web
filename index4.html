@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIV HAM Satellite Orbit</title>
+    <style>
+        :root {
+            --bg: #030305;
+            --primary: #00f2ff;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: var(--bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        #ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        /* The Central Logo */
+        .logo-container {
+            position: relative;
+            z-index: 10;
+        }
+
+        .aiv-svg {
+            width: 320px;
+            filter: drop-shadow(0 0 12px var(--primary));
+        }
+
+        .letter {
+            fill: none;
+            stroke: var(--primary);
+            stroke-width: 5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            transition: stroke 0.2s ease;
+        }
+
+        /* The Satellite Orbiting Container */
+        .orbit-wrapper {
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            animation: rotateOrbit 12s linear infinite;
+        }
+
+        @keyframes rotateOrbit {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .satellite {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 80px;
+        }
+
+        /* Interaction Elements */
+        .particle {
+            position: absolute;
+            fill: white;
+            opacity: 0.4;
+            transition: fill 0.3s;
+        }
+    </style>
+</head>
+<body>
+
+    <svg id="ui-layer" xmlns="http://www.w3.org/2000/svg"></svg>
+
+    <div class="logo-container">
+        <div class="orbit-wrapper">
+            <svg class="satellite" viewBox="0 0 100 100">
+                <rect x="5" y="40" width="30" height="20" fill="#333" stroke="cyan" />
+                <rect x="65" y="40" width="30" height="20" fill="#333" stroke="cyan" />
+                <rect x="35" y="30" width="30" height="40" fill="#222" stroke="white" stroke-width="2" />
+                <line x1="50" y1="30" x2="50" y2="5" stroke="white" stroke-width="2" />
+                <circle cx="50" cy="5" r="3" fill="red" class="antenna-blink" />
+                <rect x="42" y="40" width="16" height="10" fill="#444" />
+            </svg>
+        </div>
+
+        <svg class="aiv-svg" viewBox="0 0 400 150">
+            <path class="letter" d="M 60,120 L 110,30 L 160,120 M 85,90 L 135,90" />
+            <path class="letter" d="M 200,30 L 200,120 M 180,30 L 220,30 M 180,120 L 220,120" />
+            <path class="letter" d="M 260,30 L 310,120 L 360,30" />
+        </svg>
+    </div>
+
+    <script>
+        const uiLayer = document.getElementById('ui-layer');
+        const particles = [];
+        const numParticles = 20;
+
+        // Initialize Floating Interactive Particles
+        for (let i = 0; i < numParticles; i++) {
+            const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+            circle.setAttribute("r", Math.random() * 4 + 1);
+            circle.setAttribute("class", "particle");
+            uiLayer.appendChild(circle);
+            particles.push({
+                el: circle,
+                x: Math.random() * window.innerWidth,
+                y: Math.random() * window.innerHeight,
+                vx: (Math.random() - 0.5) * 2,
+                vy: (Math.random() - 0.5) * 2
+            });
+        }
+
+        let mouseX = window.innerWidth / 2;
+        let mouseY = window.innerHeight / 2;
+
+        window.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+
+            // Update Logo Color based on Mouse X
+            const hue = (e.clientX / window.innerWidth) * 360;
+            const color = `hsl(${hue}, 80%, 60%)`;
+            document.querySelectorAll('.letter').forEach(l => l.style.stroke = color);
+            
+            // Update Satellite highlights
+            document.querySelector('.satellite rect[fill="#222"]').style.stroke = color;
+        });
+
+        function animate() {
+            particles.forEach(p => {
+                // Gentle drift
+                p.x += p.vx + (mouseX - p.x) * 0.02;
+                p.y += p.vy + (mouseY - p.y) * 0.02;
+
+                // Screen Wrap
+                if (p.x < 0) p.x = window.innerWidth;
+                if (p.x > window.innerWidth) p.x = 0;
+                if (p.y < 0) p.y = window.innerHeight;
+                if (p.y > window.innerHeight) p.y = 0;
+
+                p.el.setAttribute("cx", p.x);
+                p.el.setAttribute("cy", p.y);
+                
+                // Color particles based on proximity
+                const dist = Math.hypot(mouseX - p.x, mouseY - p.y);
+                p.el.style.fill = dist < 150 ? `hsl(${(mouseX/window.innerWidth)*360}, 100%, 70%)` : "white";
+            });
+
+            requestAnimationFrame(animate);
+        }
+
+        // Antenna Blinking Effect
+        setInterval(() => {
+            const blink = document.querySelector('.antenna-blink');
+            blink.style.opacity = blink.style.opacity == "0" ? "1" : "0";
+        }, 500);
+
+        animate();
+    </script>
+</body>
+</html>
