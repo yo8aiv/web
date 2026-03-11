@@ -7,30 +7,35 @@
     <style>
         :root {
             --accent: #00f2ff;
-            --glass: rgba(255, 255, 255, 0.1);
+            --glitch-red: rgba(255, 0, 128, 0.8);
+            --glitch-blue: rgba(0, 255, 255, 0.8);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body, html {
             height: 100%;
-            background-color: #000;
+            background-color: #050505; /* Fallback color */
             color: white;
             font-family: 'Segoe UI', sans-serif;
             overflow: hidden;
         }
 
-        /* Video Background */
-        #bg-video {
+        /* Video Background Container */
+        .video-wrapper {
             position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
             z-index: -1;
-            object-fit: cover;
-            filter: brightness(0.5); /* Adjust for text readability */
+            background: radial-gradient(circle, #111 0%, #000 100%);
         }
 
-        /* Centered Content Container */
+        #bg-video {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            filter: brightness(0.4) contrast(1.2);
+        }
+
         .container {
             height: 100vh;
             display: flex;
@@ -38,100 +43,126 @@
             justify-content: center;
             align-items: center;
             text-align: center;
-            z-index: 10;
         }
 
-        /* Typewriter Styling */
+        /* GLITCH LOGO EFFECT */
+        .glitch-container {
+            position: relative;
+            display: inline-block;
+        }
+
         .typewriter-title {
-            font-size: 4rem;
-            letter-spacing: 12px;
+            font-size: 5rem;
+            letter-spacing: 15px;
             text-transform: uppercase;
-            margin-bottom: 10px;
-            font-weight: 700;
-            min-height: 1.2em; /* Prevents layout jump */
+            font-weight: 900;
+            position: relative;
+            cursor: pointer;
+        }
+
+        /* Glitch layers on hover */
+        .typewriter-title:hover::before,
+        .typewriter-title:hover::after {
+            content: "AIV";
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: transparent;
+        }
+
+        .typewriter-title:hover::before {
+            left: 2px;
+            text-shadow: -2px 0 var(--glitch-red);
+            clip: rect(44px, 450px, 56px, 0);
+            animation: glitch-anim 5s infinite linear alternate-reverse;
+        }
+
+        .typewriter-title:hover::after {
+            left: -2px;
+            text-shadow: -2px 0 var(--glitch-blue);
+            clip: rect(10px, 450px, 30px, 0);
+            animation: glitch-anim2 5s infinite linear alternate-reverse;
+        }
+
+        @keyframes glitch-anim {
+            0% { clip: rect(31px, 9999px, 94px, 0); }
+            20% { clip: rect(62px, 9999px, 42px, 0); }
+            /* ... more keyframes ... */
+            100% { clip: rect(89px, 9999px, 98px, 0); }
         }
 
         .typewriter-sub {
-            font-size: 1.2rem;
-            letter-spacing: 3px;
+            font-size: 1rem;
+            letter-spacing: 5px;
             color: var(--accent);
-            margin-bottom: 40px;
+            margin-bottom: 50px;
             min-height: 1.5em;
+            text-transform: uppercase;
+            opacity: 0.8;
         }
 
-        /* Popup Menu Buttons */
-        .menu {
-            list-style: none;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
+        /* POPUP BUTTONS */
+        .menu { list-style: none; display: flex; flex-direction: column; gap: 20px; }
 
         .menu-item {
             opacity: 0;
-            transform: translateY(-50px); /* Starts from top */
-            animation: popup 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            transform: translateY(-40px);
+            animation: dropIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
         }
 
-        @keyframes popup {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+        @keyframes dropIn { to { opacity: 1; transform: translateY(0); } }
 
         .btn {
             text-decoration: none;
             color: white;
-            padding: 12px 40px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 4px;
-            background: var(--glass);
-            backdrop-filter: blur(5px);
+            padding: 15px 50px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
             display: inline-block;
-            transition: all 0.3s ease;
-            font-weight: 300;
-            width: 250px;
-        }
-
-        .btn:hover {
-            background: white;
-            color: black;
-            border-color: white;
+            transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 280px;
             letter-spacing: 2px;
         }
 
-        /* Animation delays for the menu items */
-        .menu-item:nth-child(1) { animation-delay: 1.5s; }
-        .menu-item:nth-child(2) { animation-delay: 1.7s; }
-        .menu-item:nth-child(3) { animation-delay: 1.9s; }
-        .menu-item:nth-child(4) { animation-delay: 2.1s; }
+        .btn:hover {
+            background: var(--accent);
+            color: black;
+            border-color: var(--accent);
+            box-shadow: 0 0 20px var(--accent);
+            transform: scale(1.05);
+        }
 
+        /* Staggered Delay */
+        .menu-item:nth-child(1) { animation-delay: 1.8s; }
+        .menu-item:nth-child(2) { animation-delay: 2.0s; }
+        .menu-item:nth-child(3) { animation-delay: 2.2s; }
     </style>
 </head>
 <body>
 
-      <video autoplay muted loop playsinline id="bg-video">
-        <source src="assets/backgrnd.mp4" type="video/mp4">
-        Your browser does not support HTML5 video.
-    </video>
+    <div class="video-wrapper">
+        <video autoplay muted loop playsinline id="bg-video">
+            <source src="assets/backgrnd.mp4" type="video/mp4">
+        </video>
+    </div>
 
     <div class="container">
-        <h1 class="typewriter-title" id="main-title"></h1>
+        <div class="glitch-container">
+            <h1 class="typewriter-title" id="main-title"></h1>
+        </div>
         <p class="typewriter-sub" id="sub-title"></p>
 
         <nav>
             <ul class="menu">
-                <li class="menu-item"><a href="https://github.com/your-username/ham-sat" class="btn">HAM SATELLITE</a></li>
-                <li class="menu-item"><a href="https://github.com/your-username/orbit-vectors" class="btn">VECTOR ORBITS</a></li>
-                <li class="menu-item"><a href="https://github.com/your-username/global-net" class="btn">GLOBAL NET</a></li>
-                <li class="menu-item"><a href="https://github.com/yo8aiv" class="btn" style="border-color: var(--accent);">GITHUB PROFILE</a></li>
+                <li class="menu-item"><a href="#" class="btn">SATELLITE SYSTEMS</a></li>
+                <li class="menu-item"><a href="#" class="btn">ORBITAL VECTORS</a></li>
+                <li class="menu-item"><a href="#" class="btn" style="border-color: var(--accent);">GITHUB SOURCE</a></li>
             </ul>
         </nav>
     </div>
 
     <script>
-        // Typewriter Logic
         function typeWriter(elementId, text, speed, delay) {
             setTimeout(() => {
                 let i = 0;
@@ -140,17 +171,15 @@
                     if (i < text.length) {
                         element.innerHTML += text.charAt(i);
                         i++;
-                        setTimeout(type, speed);
+                        setTimeout(type, speed);assets/backgrnd.mp4" type="video/mp4
                     }
                 }
                 type();
             }, delay);
         }
 
-        // Initialize Typewriters
         typeWriter("main-title", "AIV", 150, 200);
-        typeWriter("sub-title", "Advancing Global Connectivity", 60, 1000);
+        typeWriter("sub-title", "Advancing Global Connectivity", 50, 1000);
     </script>
-
 </body>
 </html>
