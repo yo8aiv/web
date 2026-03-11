@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIV Interactive Vector</title>
+    <style>
+        :root {
+            --bg: #050508;
+            --primary: #00f2ff;
+            --secondary: #7000ff;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: var(--bg);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: sans-serif;
+        }
+
+        /* Interactive Background Canvas */
+        #interactive-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        /* Central Logo Container */
+        .logo-wrap {
+            position: relative;
+            z-index: 10;
+            pointer-events: none; /* Let mouse pass through to background */
+        }
+
+        .aiv-logo {
+            width: 300px;
+            filter: drop-shadow(0 0 10px var(--primary));
+        }
+
+        /* Fixed letters - no stroke-dash needed for visibility */
+        .letter {
+            fill: none;
+            stroke: var(--primary);
+            stroke-width: 4;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            transition: stroke 0.3s ease;
+        }
+
+        /* Orbiting background lines */
+        .orbit {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.1);
+            stroke-width: 1;
+            transform-origin: center;
+            animation: spin 20s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .cursor-follower {
+            transition: fill 0.2s ease;
+        }
+    </style>
+</head>
+<body>
+
+    <svg id="interactive-svg" xmlns="http://www.w3.org/2000/svg">
+        <circle class="orbit" cx="50%" cy="50%" r="150" />
+        <circle class="orbit" cx="50%" cy="50%" r="250" style="animation-direction: reverse; stroke-dasharray: 5 10;" />
+        
+        </svg>
+
+    <div class="logo-wrap">
+        <svg class="aiv-logo" viewBox="0 0 400 150">
+            <path class="letter" d="M 50,120 L 100,30 L 150,120 M 75,90 L 125,90" />
+            <path class="letter" d="M 200,30 L 200,120 M 180,30 L 220,30 M 180,120 L 220,120" />
+            <path class="letter" d="M 250,30 L 300,120 L 350,30" />
+        </svg>
+    </div>
+
+    <script>
+        const svg = document.getElementById('interactive-svg');
+        const particles = [];
+        const particleCount = 15;
+
+        // Create random SVG shapes that follow mouse
+        for (let i = 0; i < particleCount; i++) {
+            const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+            circle.setAttribute("r", Math.random() * 15 + 5);
+            circle.setAttribute("class", "cursor-follower");
+            circle.setAttribute("fill", "white");
+            circle.setAttribute("opacity", "0.5");
+            svg.appendChild(circle);
+            particles.push({
+                el: circle,
+                x: Math.random() * window.innerWidth,
+                y: Math.random() * window.innerHeight,
+                speed: 0.05 + Math.random() * 0.1
+            });
+        }
+
+        let mouseX = window.innerWidth / 2;
+        let mouseY = window.innerHeight / 2;
+
+        window.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+
+            // Change Logo color based on mouse X position
+            const hue = (e.clientX / window.innerWidth) * 360;
+            document.querySelectorAll('.letter').forEach(l => {
+                l.style.stroke = `hsl(${hue}, 100%, 50%)`;
+            });
+        });
+
+        function animate() {
+            particles.forEach((p, i) => {
+                // Smoothly follow the mouse
+                p.x += (mouseX - p.x) * p.speed;
+                p.y += (mouseY - p.y) * p.speed;
+                
+                // Add a little offset so they don't all stack perfectly
+                const offsetX = Math.sin(Date.now() * 0.002 + i) * 50;
+                const offsetY = Math.cos(Date.now() * 0.002 + i) * 50;
+
+                p.el.setAttribute("cx", p.x + offsetX);
+                p.el.setAttribute("cy", p.y + offsetY);
+
+                // Change color of shapes based on mouse distance
+                const colorVal = Math.floor((p.x / window.innerWidth) * 255);
+                p.el.setAttribute("fill", `rgb(${colorVal}, 100, 255)`);
+            });
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+    </script>
+</body>
+</html>
