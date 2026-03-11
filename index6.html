@@ -3,20 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AIV Earth Center - HAM Network</title>
+    <title>AIV - Deep Space HAM Network</title>
     <style>
         :root {
-            --bg: #020205;
+            --bg: #010103;
             --primary: #00f2ff;
             --land: #2d5a27;
-            --water: #1a3a6d;
+            --water: #0b2545;
         }
 
         body, html {
             margin: 0; padding: 0;
             width: 100%; height: 100%;
             background-color: var(--bg);
-            color: white;
             overflow: hidden;
             display: flex;
             justify-content: center;
@@ -24,53 +23,59 @@
             font-family: 'Segoe UI', sans-serif;
         }
 
-        /* Container for everything */
+        /* PARALLAX STARFIELD */
+        #star-layer {
+            position: absolute;
+            top: -10%; left: -10%;
+            width: 120%; height: 120%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* VIEWPORT CONTAINER */
         .viewport {
             position: relative;
-            width: 100vw;
-            height: 100vh;
+            width: 100vw; height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
+            z-index: 2;
         }
 
-        /* BIG CENTRAL EARTH */
+        /* CENTRAL EARTH */
         .earth-container {
             position: relative;
-            width: 400px;
-            height: 400px;
+            width: 450px; height: 450px;
             border-radius: 50%;
             background: var(--water);
-            box-shadow: inset -20px -20px 50px rgba(0,0,0,0.8), 0 0 30px var(--primary);
+            box-shadow: inset -30px -30px 60px rgba(0,0,0,0.9), 0 0 40px rgba(0, 242, 255, 0.3);
             overflow: hidden;
             z-index: 5;
-            border: 2px solid rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.1);
         }
 
-        /* Spinning Land */
+        /* Spinning Land & Clouds */
+        .map-layer, .cloud-layer {
+            position: absolute;
+            width: 200%; height: 100%;
+            animation: spin 20s linear infinite;
+        }
+
         .map-layer {
-            position: absolute;
-            width: 200%;
-            height: 100%;
             background-image: 
-                radial-gradient(circle at 20% 50%, var(--land) 15%, transparent 16%),
-                radial-gradient(circle at 45% 30%, var(--land) 20%, transparent 21%),
-                radial-gradient(circle at 75% 60%, var(--land) 25%, transparent 26%);
-            animation: spin 15s linear infinite;
+                radial-gradient(circle at 10% 40%, var(--land) 12%, transparent 13%),
+                radial-gradient(circle at 40% 20%, var(--land) 18%, transparent 19%),
+                radial-gradient(circle at 70% 70%, var(--land) 22%, transparent 23%),
+                radial-gradient(circle at 85% 30%, var(--land) 15%, transparent 16%);
         }
 
-        /* Drifting Clouds */
         .cloud-layer {
-            position: absolute;
-            width: 200%;
-            height: 100%;
-            background: transparent;
-            opacity: 0.4;
-            background-image: 
-                radial-gradient(ellipse at 10% 20%, #fff 10%, transparent 20%),
-                radial-gradient(ellipse at 60% 80%, #fff 12%, transparent 22%);
-            filter: blur(8px);
-            animation: spin 25s linear infinite reverse;
+            opacity: 0.3;
+            filter: blur(10px);
+            background-image: radial-gradient(ellipse at 30% 50%, #fff 15%, transparent 30%),
+                              radial-gradient(ellipse at 80% 20%, #fff 10%, transparent 25%);
+            animation-duration: 35s;
+            animation-direction: reverse;
         }
 
         @keyframes spin {
@@ -78,61 +83,52 @@
             to { transform: translateX(-50%); }
         }
 
-        /* THE BUILDINGS (Static on Earth center) */
-        .cityscape {
+        /* BUILDINGS */
+        .city {
             position: absolute;
-            bottom: 45%;
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: flex-end;
+            bottom: 40%; width: 100%;
+            display: flex; justify-content: center; align-items: flex-end;
             z-index: 6;
-            pointer-events: none;
         }
-        .bldg { fill: #111; stroke: var(--primary); stroke-width: 1; transition: stroke 0.3s; }
+        .tower { fill: #000; stroke: var(--primary); stroke-width: 1.5; transition: stroke 0.3s; }
 
-        /* AIV LOGO (Floating in front) */
-        .logo-overlay {
+        /* AIV LOGO */
+        .logo-wrap {
             position: absolute;
             z-index: 20;
             pointer-events: none;
-            filter: drop-shadow(0 0 10px var(--primary));
+            filter: drop-shadow(0 0 15px var(--primary));
         }
         .letter {
             fill: none;
             stroke: var(--primary);
-            stroke-width: 6;
+            stroke-width: 7;
             stroke-linecap: round;
             transition: stroke 0.3s;
         }
 
         /* SATELLITE ORBIT */
-        .sat-orbit-path {
+        .orbit-ring {
             position: absolute;
-            width: 700px;
-            height: 700px;
-            animation: rotate 10s linear infinite;
+            width: 750px; height: 750px;
+            animation: rotate 12s linear infinite;
             z-index: 30;
         }
-        .sat-body {
-            position: absolute;
-            top: 0; left: 50%;
-            transform: translateX(-50%);
-        }
+        .sat { position: absolute; top: 0; left: 50%; transform: translateX(-50%); }
 
         /* BEAM */
-        #data-beam {
+        #beam-svg {
             position: absolute;
-            top: 0; left: 0;
             width: 100%; height: 100%;
             pointer-events: none;
             z-index: 25;
         }
-        #beam-line {
+        #beam-path {
             stroke: var(--primary);
             stroke-width: 2;
-            stroke-dasharray: 5;
-            opacity: 0.7;
+            stroke-dasharray: 6;
+            opacity: 0.8;
+            filter: drop-shadow(0 0 5px var(--primary));
         }
 
         @keyframes rotate {
@@ -143,79 +139,90 @@
 </head>
 <body>
 
+    <svg id="star-layer" xmlns="http://www.w3.org/2000/svg"></svg>
+
     <div class="viewport">
         <div class="earth-container">
             <div class="map-layer"></div>
             <div class="cloud-layer"></div>
-            
-            <div class="cityscape">
-                <svg width="150" height="50" viewBox="0 0 150 50">
-                    <rect class="bldg" x="40" y="20" width="15" height="30" />
-                    <rect class="bldg" x="60" y="5" width="10" height="45" />
-                    <rect class="bldg" x="75" y="15" width="20" height="35" />
-                    <circle id="target-point" cx="65" cy="5" r="2" fill="red" />
+            <div class="city">
+                <svg width="100" height="60" viewBox="0 0 100 60">
+                    <rect class="tower" x="42" y="10" width="15" height="50" />
+                    <line class="tower" x1="50" y1="10" x2="50" y2="0" />
+                    <circle id="ground-station" cx="50" cy="0" r="2" fill="red" />
                 </svg>
             </div>
         </div>
 
-        <div class="logo-overlay">
-            <svg width="400" height="150" viewBox="0 0 400 150">
-                <path class="letter" d="M 80,120 L 130,30 L 180,120 M 105,90 L 155,90" />
-                <path class="letter" d="M 200,30 L 200,120" />
-                <path class="letter" d="M 220,30 L 270,120 L 320,30" />
+        <div class="logo-wrap">
+            <svg width="450" height="150" viewBox="0 0 450 150">
+                <path class="letter" d="M 100,120 L 150,30 L 200,120 M 125,90 L 175,90" />
+                <path class="letter" d="M 225,30 L 225,120" />
+                <path class="letter" d="M 250,30 L 300,120 L 350,30" />
             </svg>
         </div>
 
-        <div class="sat-orbit-path">
-            <svg class="sat-body" width="60" height="60" viewBox="0 0 100 100">
-                <rect x="0" y="40" width="30" height="20" fill="#333" stroke="var(--primary)" />
-                <rect x="70" y="40" width="30" height="20" fill="#333" stroke="var(--primary)" />
-                <rect x="30" y="30" width="40" height="40" fill="#111" stroke="white" />
-                <circle id="sat-origin" cx="50" cy="50" r="2" fill="red" />
+        <div class="orbit-ring">
+            <svg class="sat" width="70" height="70" viewBox="0 0 100 100">
+                <rect x="0" y="40" width="30" height="20" fill="#222" stroke="var(--primary)" />
+                <rect x="70" y="40" width="30" height="20" fill="#222" stroke="var(--primary)" />
+                <rect x="30" y="30" width="40" height="40" fill="#111" stroke="#fff" />
+                <circle id="sat-antenna" cx="50" cy="50" r="3" fill="red" />
             </svg>
         </div>
 
-        <svg id="data-beam">
-            <line id="beam-line" x1="0" y1="0" x2="0" y2="0" />
+        <svg id="beam-svg">
+            <line id="beam-path" x1="0" y1="0" x2="0" y2="0" />
         </svg>
     </div>
 
     <script>
-        const beam = document.getElementById('beam-line');
-        const satOrigin = document.getElementById('sat-origin');
-        const targetPoint = document.getElementById('target-point');
-        const letters = document.querySelectorAll('.letter');
-        const bldgs = document.querySelectorAll('.bldg');
+        const stars = document.getElementById('star-layer');
+        const starCount = 150;
+        const beam = document.getElementById('beam-path');
+        const satAntenna = document.getElementById('sat-antenna');
+        const groundStation = document.getElementById('ground-station');
 
-        // Mouse Interactivity: Color Change
-        window.addEventListener('mousemove', (e) => {
-            const hue = (e.clientX / window.innerWidth) * 360;
-            const color = `hsl(${hue}, 100%, 60%)`;
-            
-            // Update CSS Variable
-            document.documentElement.style.setProperty('--primary', color);
-            
-            // Apply to SVG elements directly for smoothness
-            letters.forEach(l => l.style.stroke = color);
-            bldgs.forEach(b => b.style.stroke = color);
-            beam.style.stroke = color;
-        });
-
-        // Beam Logic: Connect Sat to Building
-        function animateBeam() {
-            const satRect = satOrigin.getBoundingClientRect();
-            const targetRect = targetPoint.getBoundingClientRect();
-
-            // Set line coordinates based on element positions
-            beam.setAttribute('x1', satRect.left + satRect.width / 2);
-            beam.setAttribute('y1', satRect.top + satRect.height / 2);
-            beam.setAttribute('x2', targetRect.left + targetRect.width / 2);
-            beam.setAttribute('y2', targetRect.top + targetRect.height / 2);
-
-            requestAnimationFrame(animateBeam);
+        // Create random stars
+        for (let i = 0; i < starCount; i++) {
+            const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+            circle.setAttribute("cx", Math.random() * 100 + "%");
+            circle.setAttribute("cy", Math.random() * 100 + "%");
+            circle.setAttribute("r", Math.random() * 1.5);
+            circle.setAttribute("fill", "white");
+            circle.setAttribute("opacity", Math.random());
+            stars.appendChild(circle);
         }
 
-        animateBeam();
+        window.addEventListener('mousemove', (e) => {
+            const xPercent = e.clientX / window.innerWidth;
+            const yPercent = e.clientY / window.innerHeight;
+
+            // Parallax Stars
+            const moveX = (xPercent - 0.5) * 30;
+            const moveY = (yPercent - 0.5) * 30;
+            stars.style.transform = `translate(${moveX}px, ${moveY}px)`;
+
+            // Color shift
+            const hue = xPercent * 360;
+            const color = `hsl(${hue}, 100%, 65%)`;
+            document.documentElement.style.setProperty('--primary', color);
+            document.querySelectorAll('.letter, .tower, #beam-path').forEach(el => el.style.stroke = color);
+        });
+
+        function syncBeam() {
+            const satRect = satAntenna.getBoundingClientRect();
+            const groundRect = groundStation.getBoundingClientRect();
+
+            beam.setAttribute('x1', satRect.left + satRect.width/2);
+            beam.setAttribute('y1', satRect.top + satRect.height/2);
+            beam.setAttribute('x2', groundRect.left + groundRect.width/2);
+            beam.setAttribute('y2', groundRect.top + groundRect.height/2);
+
+            requestAnimationFrame(syncBeam);
+        }
+
+        syncBeam();
     </script>
 </body>
 </html>
