@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIV | GitHub Portfolio</title>
+    <style>
+        :root {
+            --accent: #00f2ff;
+            --glass: rgba(255, 255, 255, 0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body, html {
+            height: 100%;
+            background-color: #000;
+            color: white;
+            font-family: 'Segoe UI', sans-serif;
+            overflow: hidden;
+        }
+
+        /* Video Background */
+        #bg-video {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -1;
+            object-fit: cover;
+            filter: brightness(0.5); /* Adjust for text readability */
+        }
+
+        /* Centered Content Container */
+        .container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            z-index: 10;
+        }
+
+        /* Typewriter Styling */
+        .typewriter-title {
+            font-size: 4rem;
+            letter-spacing: 12px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            font-weight: 700;
+            min-height: 1.2em; /* Prevents layout jump */
+        }
+
+        .typewriter-sub {
+            font-size: 1.2rem;
+            letter-spacing: 3px;
+            color: var(--accent);
+            margin-bottom: 40px;
+            min-height: 1.5em;
+        }
+
+        /* Popup Menu Buttons */
+        .menu {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .menu-item {
+            opacity: 0;
+            transform: translateY(-50px); /* Starts from top */
+            animation: popup 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes popup {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .btn {
+            text-decoration: none;
+            color: white;
+            padding: 12px 40px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+            background: var(--glass);
+            backdrop-filter: blur(5px);
+            display: inline-block;
+            transition: all 0.3s ease;
+            font-weight: 300;
+            width: 250px;
+        }
+
+        .btn:hover {
+            background: white;
+            color: black;
+            border-color: white;
+            letter-spacing: 2px;
+        }
+
+        /* Animation delays for the menu items */
+        .menu-item:nth-child(1) { animation-delay: 1.5s; }
+        .menu-item:nth-child(2) { animation-delay: 1.7s; }
+        .menu-item:nth-child(3) { animation-delay: 1.9s; }
+        .menu-item:nth-child(4) { animation-delay: 2.1s; }
+
+    </style>
+</head>
+<body>
+
+    <video autoplay muted loop playsinline id="bg-video">
+        <source src="assets/backgrnd.mp4" type="video/mp4">
+    </video>
+
+    <div class="container">
+        <h1 class="typewriter-title" id="main-title"></h1>
+        <p class="typewriter-sub" id="sub-title"></p>
+
+        <nav>
+            <ul class="menu">
+                <li class="menu-item"><a href="https://github.com/your-username/ham-sat" class="btn">HAM SATELLITE</a></li>
+                <li class="menu-item"><a href="https://github.com/your-username/orbit-vectors" class="btn">VECTOR ORBITS</a></li>
+                <li class="menu-item"><a href="https://github.com/your-username/global-net" class="btn">GLOBAL NET</a></li>
+                <li class="menu-item"><a href="https://github.com/your-username" class="btn" style="border-color: var(--accent);">GITHUB PROFILE</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <script>
+        // Typewriter Logic
+        function typeWriter(elementId, text, speed, delay) {
+            setTimeout(() => {
+                let i = 0;
+                const element = document.getElementById(elementId);
+                function type() {
+                    if (i < text.length) {
+                        element.innerHTML += text.charAt(i);
+                        i++;
+                        setTimeout(type, speed);
+                    }
+                }
+                type();
+            }, delay);
+        }
+
+        // Initialize Typewriters
+        typeWriter("main-title", "AIV", 150, 200);
+        typeWriter("sub-title", "Advancing Global Connectivity", 60, 1000);
+    </script>
+
+</body>
+</html>
