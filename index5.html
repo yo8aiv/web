@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIV Global HAM Network</title>
+    <style>
+        :root {
+            --space-bg: #05050a;
+            --primary: #00f2ff;
+            --earth-water: #1a3a6d;
+            --earth-land: #2d5a27;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--space-bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .main-stage {
+            position: relative;
+            width: 800px;
+            height: 800px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* EARTH ASSEMBLY */
+        .earth-system {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            animation: orbitEarth 30s linear infinite;
+            z-index: 5;
+        }
+
+        .earth-sphere {
+            width: 100px;
+            height: 100px;
+            background: var(--earth-water);
+            border-radius: 50%;
+            position: absolute;
+            top: 0; left: 50%;
+            transform: translate(-50%, -50%);
+            overflow: hidden;
+            border: 2px solid rgba(255,255,255,0.2);
+            box-shadow: inset -10px -10px 20px rgba(0,0,0,0.5), 0 0 20px var(--primary);
+        }
+
+        /* Spinning Land Effect */
+        .continents {
+            width: 200%;
+            height: 100%;
+            background-image: linear-gradient(90deg, transparent 20%, var(--earth-land) 20%, var(--earth-land) 40%, transparent 40%, transparent 60%, var(--earth-land) 60%, var(--earth-land) 80%, transparent 80%);
+            animation: spinLand 10s linear infinite;
+        }
+
+        /* Buildings on Earth */
+        .building { fill: #333; stroke: #000; stroke-width: 0.5; }
+
+        /* LOGO */
+        .logo-center {
+            z-index: 10;
+            filter: drop-shadow(0 0 15px var(--primary));
+        }
+        .letter {
+            fill: none;
+            stroke: var(--primary);
+            stroke-width: 4;
+            transition: stroke 0.3s;
+        }
+
+        /* SATELLITE & BEAM */
+        .sat-orbit {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            animation: rotate 15s linear infinite;
+            z-index: 15;
+        }
+
+        #transmission-beam {
+            stroke: var(--primary);
+            stroke-width: 2;
+            stroke-dasharray: 4;
+            opacity: 0.6;
+            filter: blur(1px);
+        }
+
+        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes orbitEarth { from { transform: rotate(360deg); } to { transform: rotate(0deg); } }
+        @keyframes spinLand { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+    </style>
+</head>
+<body>
+
+    <div class="main-stage">
+        <svg class="logo-center" width="300" height="100" viewBox="0 0 300 100">
+            <path id="pathA" class="letter" d="M 20,90 L 50,10 L 80,90 M 35,60 L 65,60" />
+            <path id="pathI" class="letter" d="M 120,10 L 120,90 M 105,10 L 135,10 M 105,90 L 135,90" />
+            <path id="pathV" class="letter" d="M 170,10 L 210,90 L 250,10" />
+        </svg>
+
+        <div class="earth-system">
+            <div class="earth-sphere">
+                <div class="continents"></div>
+                <svg viewBox="0 0 100 100" style="position:absolute; bottom:0;">
+                    <rect class="building" x="30" y="80" width="10" height="20" />
+                    <rect class="building" x="45" y="70" width="8" height="30" />
+                    <path class="building" d="M 60,100 L 70,100 L 65,60 Z" /> </svg>
+            </div>
+        </div>
+
+        <div class="sat-orbit">
+            <svg id="sat-svg" width="80" height="80" viewBox="0 0 100 100" style="position:absolute; top:0; left:50%; transform:translateX(-50%)">
+                <rect x="10" y="40" width="25" height="15" fill="#444" stroke="cyan" />
+                <rect x="65" y="40" width="25" height="15" fill="#444" stroke="cyan" />
+                <rect x="35" y="30" width="30" height="35" fill="#222" stroke="white" />
+                <line x1="50" y1="30" x2="50" y2="5" stroke="white" />
+                <circle cx="50" cy="5" r="3" fill="red" />
+            </svg>
+        </div>
+
+        <svg style="position:absolute; width:100%; height:100%; pointer-events:none; z-index:20;">
+            <line id="transmission-beam" x1="0" y1="0" x2="400" y2="400" />
+        </svg>
+    </div>
+
+    <script>
+        const beam = document.getElementById('transmission-beam');
+        const sat = document.getElementById('sat-svg');
+        const letters = document.querySelectorAll('.letter');
+
+        function updateBeam() {
+            const satRect = sat.getBoundingClientRect();
+            const stageRect = document.querySelector('.main-stage').getBoundingClientRect();
+            
+            // Calculate center of satellite and center of logo
+            const startX = satRect.left + satRect.width / 2;
+            const startY = satRect.top + satRect.height / 2;
+            const endX = window.innerWidth / 2;
+            const endY = window.innerHeight / 2;
+
+            beam.setAttribute('x1', startX);
+            beam.setAttribute('y1', startY);
+            beam.setAttribute('x2', endX);
+            beam.setAttribute('y2', endY);
+
+            requestAnimationFrame(updateBeam);
+        }
+
+        window.addEventListener('mousemove', (e) => {
+            const hue = (e.clientX / window.innerWidth) * 360;
+            const color = `hsl(${hue}, 100%, 50%)`;
+            document.documentElement.style.setProperty('--primary', color);
+            beam.style.stroke = color;
+        });
+
+        updateBeam();
+    </script>
+</body>
+</html>
